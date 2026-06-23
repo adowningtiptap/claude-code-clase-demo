@@ -1,25 +1,36 @@
 # Contexto del proyecto (para Claude Code)
 
-Este es un proyecto de **clase / demo**. Stack:
+Proyecto de **clase / demo**. Stack: **Next.js 16** (App Router, TS) +
+**Supabase** (DB + Auth) + **Vercel**.
 
-- **Next.js 15** (App Router, TypeScript)
-- **Supabase** como base de datos (Postgres) — clientes en `lib/supabase/`
-- **Vercel** para el deploy
+## ⚡ Onboarding automático (LEER PRIMERO)
+
+Si acabas de clonar/abrir este repo y **NO existe `.env.local`** (o falta
+`NEXT_PUBLIC_SUPABASE_URL`), el proyecto aún no está configurado. En ese caso,
+**ejecuta el flujo del comando `/setup`** (ver `.claude/commands/setup.md`) para
+crear la base de datos en Supabase, aplicar la migración, configurar la auth y
+escribir `.env.local`. No le pidas al alumno correr SQL ni copiar llaves a mano.
+
+Para desplegar, usa el flujo de `/deploy` (`.claude/commands/deploy.md`).
 
 ## Convenciones
 
-- Usa `lib/supabase/server.ts` en Server Components / Route Handlers.
-- Usa `lib/supabase/client.ts` en componentes con `"use client"`.
-- Las variables de entorno van en `.env.local` (nunca commitear). Ver `.env.example`.
-- El esquema de la base vive en `supabase/migrations/`.
-
-## Cómo correr
-
-```bash
-npm install
-npm run dev        # http://localhost:3000
-```
+- `lib/supabase/server.ts` → Server Components / Route Handlers / Server Actions.
+- `lib/supabase/client.ts` → componentes con `"use client"`.
+- `lib/supabase/middleware.ts` + `middleware.ts` → refrescan sesión y protegen
+  rutas que empiezan con `/dashboard`.
+- Auth: **email + contraseña**, confirmación de email desactivada en dev.
+- Variables en `.env.local` (nunca commitear). MCP usa `SUPABASE_ACCESS_TOKEN`.
+- Esquema en `supabase/migrations/`.
 
 ## Tablas
 
-- `messages` — lista de mensajes demo (solo lectura pública vía RLS).
+- `messages` — mensajes demo. Lectura pública; escritura solo del dueño
+  (`user_id = auth.uid()`) vía RLS.
+
+## Cómo correr (si ya está configurado)
+
+```bash
+npm install
+npm run dev   # http://localhost:3000
+```

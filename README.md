@@ -1,76 +1,68 @@
 # Claude Code · Clase Demo
 
-Starter **Next.js 15 + Supabase**, listo para desplegar en **Vercel**. Pensado
-para una clase de Claude Code: clonas, configuras 2 llaves, y arrancas.
-
-La página de inicio lee una lista de mensajes **en vivo desde Supabase**.
-
----
-
-## 🚀 Deploy en 1 clic (Vercel)
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fadowningtiptap%2Fclaude-code-clase-demo&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY&envDescription=Llaves%20de%20tu%20proyecto%20Supabase%20(Project%20Settings%20%E2%86%92%20API))
-
-Vercel te pedirá las dos variables de Supabase durante el deploy.
+Kit de arranque autónomo: **Next.js 16 + Supabase (DB + Auth) + Vercel**.
+Con Claude Code instalado, pegas el link del repo y el agente arma toda la base
+del proyecto por ti. Sin SQL manual, sin copiar llaves a mano.
 
 ---
 
-## 🧑‍💻 Correr localmente
+## 🚀 La forma fácil (un solo prompt)
 
-Requisitos: **Node 20+** y **git**.
+1. Instala Claude Code:
 
-```bash
-git clone https://github.com/adowningtiptap/claude-code-clase-demo.git
-cd claude-code-clase-demo
-npm install
-cp .env.example .env.local   # rellena tus llaves de Supabase
-npm run dev                  # http://localhost:3000
-```
+   ```bash
+   curl -fsSL https://claude.ai/install.sh | bash    # Mac/Linux
+   # irm https://claude.ai/install.ps1 | iex          # Windows (PowerShell)
+   ```
 
----
+2. En una carpeta vacía, corre `claude` y pega este prompt:
 
-## 🗄️ Configurar Supabase (una vez)
+   > Clona y configura este proyecto: https://github.com/adowningtiptap/claude-code-clase-demo
 
-1. Crea un proyecto en [supabase.com](https://supabase.com).
-2. **SQL Editor** → pega y ejecuta el contenido de
-   [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql).
-   (Crea la tabla `messages` con datos de ejemplo.)
-3. **Project Settings → API** → copia:
-   - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
-   - `anon` `public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-4. Pega esas dos en tu `.env.local` (local) y en
-   **Vercel → Project Settings → Environment Variables** (producción).
+3. Claude clona el repo, lee `CLAUDE.md` y arranca el `/setup` solo. Te pedirá
+   **una sola cosa**: tu *Access Token* de Supabase
+   (genéralo en https://supabase.com/dashboard/account/tokens y pégalo).
+
+4. Listo: Claude crea la base de datos, corre la migración, configura la auth,
+   escribe `.env.local` y levanta la app en http://localhost:3000.
+
+5. Para publicar, dile a Claude **"despliega"** (comando `/deploy`): hará el
+   deploy en Vercel (un OAuth de un clic) y te dará la URL en vivo.
 
 ---
 
-## 🤖 Usar con Claude Code
+## 💻 En GitHub Codespaces (cero instalación)
 
-```bash
-# Instalar Claude Code (binario nativo, sin Node):
-curl -fsSL https://claude.ai/install.sh | bash    # Mac/Linux
-# irm https://claude.ai/install.ps1 | iex          # Windows (PowerShell)
+Abre el repo en Codespaces (botón **Code → Codespaces**). Node, git y Claude Code
+ya vienen listos. Luego corre `claude` y escribe `/setup`.
 
-cd claude-code-clase-demo
-claude
-```
+---
 
-Ideas para la clase, pídeselas a Claude Code:
+## 🛠️ Comandos del kit
 
-- "Agrega un formulario para insertar un mensaje nuevo en Supabase."
-- "Crea una tabla `tareas` y una página `/tareas` que la liste."
+- `/setup` — crea la DB en Supabase, corre la migración, configura auth y escribe
+  `.env.local`.
+- `/deploy` — despliega a Vercel (crea proyecto, sube env vars, publica).
+
+## 🤖 Ideas para la clase (pídeselas a Claude Code)
+
+- "Agrega un formulario para insertar un mensaje nuevo (ligado a mi usuario)."
+- "Crea una tabla `tareas` y una página `/tareas` protegida que la liste."
 - "Cambia el diseño de la página de inicio."
-
-El archivo [`CLAUDE.md`](CLAUDE.md) le da contexto del proyecto a Claude Code.
-
----
 
 ## 📁 Estructura
 
 ```
-app/                  # Next.js App Router (página + estilos)
-lib/supabase/         # clientes de Supabase (server + browser)
-supabase/migrations/  # esquema SQL de la base
-.env.example          # plantilla de variables de entorno
-vercel.json           # config de Vercel
-CLAUDE.md             # contexto del proyecto para Claude Code
+app/                  # Next.js App Router (home, login, dashboard protegido)
+lib/supabase/         # clientes Supabase (server, browser, middleware)
+middleware.ts         # refresca sesión y protege rutas
+supabase/migrations/  # esquema SQL (lo aplica /setup automáticamente)
+.claude/commands/     # comandos /setup y /deploy
+.mcp.json             # MCP de Supabase y Vercel
+.devcontainer/        # entorno Codespaces (cero instalación)
+CLAUDE.md             # contexto + onboarding automático
 ```
+
+## 🚀 Fallback: deploy manual con botón
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fadowningtiptap%2Fclaude-code-clase-demo&env=NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY)
