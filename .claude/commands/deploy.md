@@ -18,7 +18,7 @@ Requiere que `/setup` ya haya escrito `.env.local`.
   `.env.local`:
   - `NEXT_PUBLIC_SUPABASE_URL`
   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- NO subas `SUPABASE_ACCESS_TOKEN` (es solo para el agente en local).
+- Solo esas dos variables públicas; no hay tokens que subir.
 
 ## 4. Desplegar a producción
 - Lanza el deploy a producción vía el MCP de Vercel.

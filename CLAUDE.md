@@ -13,14 +13,21 @@ escribir `.env.local`. No le pidas al alumno correr SQL ni copiar llaves a mano.
 
 Para desplegar, usa el flujo de `/deploy` (`.claude/commands/deploy.md`).
 
+## MCP
+
+- Supabase y Vercel están configurados como MCP **HTTP** en `.mcp.json`
+  (`https://mcp.supabase.com/mcp` y `https://mcp.vercel.com`). Ambos se
+  autentican con **OAuth de navegador** — sin tokens. Funcionan igual en
+  Windows, macOS, Linux y Codespaces.
+
 ## Convenciones
 
 - `lib/supabase/server.ts` → Server Components / Route Handlers / Server Actions.
 - `lib/supabase/client.ts` → componentes con `"use client"`.
-- `lib/supabase/middleware.ts` + `middleware.ts` → refrescan sesión y protegen
-  rutas que empiezan con `/dashboard`.
+- `lib/supabase/middleware.ts` + `proxy.ts` → refrescan sesión y protegen
+  rutas que empiezan con `/dashboard` (convención `proxy` de Next 16).
 - Auth: **email + contraseña**, confirmación de email desactivada en dev.
-- Variables en `.env.local` (nunca commitear). MCP usa `SUPABASE_ACCESS_TOKEN`.
+- Variables en `.env.local` (nunca commitear). Las escribe `/setup`.
 - Esquema en `supabase/migrations/`.
 
 ## Tablas
