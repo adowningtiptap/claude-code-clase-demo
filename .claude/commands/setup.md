@@ -1,43 +1,71 @@
 ---
-description: Crea la base de datos en Supabase, aplica la migración, configura auth y deja la app corriendo.
+description: Crea la base de datos en Supabase y deja la app corriendo — usando la Management API (determinista, funciona en Windows/Mac/Linux).
 ---
 
-Eres el orquestador del arranque de este proyecto. Ejecuta estos pasos en orden,
-informando al alumno en español de forma breve en cada paso. Es idempotente:
-si algo ya existe, enlázalo en vez de recrearlo.
+Eres el orquestador del arranque. Usa la **Management API de Supabase con `curl`**
+(NO el MCP): es determinista, cubre todo el flujo y funciona igual en Windows,
+macOS y Linux (sin `npx`). Informa al alumno en español, breve, en cada paso.
+Es idempotente: si algo ya existe, enlázalo en vez de recrearlo.
 
-## 1. Autenticar Supabase (OAuth, sin token)
-- Usa el MCP de Supabase (HTTP, hospedado). La primera vez abrirá el navegador
-  para un OAuth de Supabase (un clic). No necesitas Personal Access Token.
-- No continúes hasta que el MCP esté autenticado.
+## Regla de oro: higiene de secretos
+- El token de Supabase y cualquier password generado van al **scratchpad**, NUNCA
+  al repo y NUNCA los imprimas en pantalla (`echo`). Lo único que escribes en el
+  proyecto es `.env.local` (que está en `.gitignore`).
+- Al terminar, recuérdale al alumno que puede **revocar el token** en
+  https://supabase.com/dashboard/account/tokens (queda en el historial del chat).
 
-## 2. Crear o enlazar el proyecto Supabase (MCP de Supabase)
-- Lista las organizaciones del alumno con el MCP de Supabase.
-- Busca un proyecto llamado `claude-code-clase-demo`. Si existe, úsalo.
-- Si no existe, créalo (`create_project`, región más cercana, p. ej. `us-east-1`)
-  y espera a que esté ACTIVE antes de seguir.
+## 1. Token de Supabase
+- Busca `SUPABASE_ACCESS_TOKEN` en el entorno. Si no está, pide al alumno
+  generarlo en https://supabase.com/dashboard/account/tokens (empieza con `sbp_`)
+  y pegarlo. Guárdalo en el scratchpad. No continúes sin token.
+- Header para todas las llamadas: `-H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"`.
 
-## 3. Aplicar la migración (MCP de Supabase)
-- Aplica el SQL de `supabase/migrations/0001_init.sql` con `apply_migration`.
-  Confirma que la tabla `public.messages` y sus políticas RLS quedaron creadas.
-  No le pidas al alumno correr SQL a mano.
+## 2. Crear o enlazar el proyecto
+- Lista orgs: `GET https://api.supabase.com/v1/organizations`.
+- Lista proyectos: `GET https://api.supabase.com/v1/projects`. Si ya existe uno
+  llamado `claude-code-clase-demo`, usa su `id` (ref) y salta al paso 4.
+- Si no existe, genera un **db password fuerte** (guárdalo en el scratchpad) y crea:
+  ```
+  POST https://api.supabase.com/v1/projects
+  { "name": "claude-code-clase-demo", "organization_id": "<org_id>",
+    "region": "us-east-1", "db_pass": "<password_generado>" }
+  ```
+  Guarda el `ref` que devuelve.
 
-## 4. Configurar auth
-- Asegura que el proveedor email/password esté habilitado y que la
-  **confirmación de email esté desactivada** (autoconfirm) para dev. Si no se
-  puede vía MCP, indica el toggle exacto en Authentication → Providers → Email.
+## 3. Esperar a que la base esté lista (poll)
+- Sondea `GET https://api.supabase.com/v1/projects/<ref>` cada ~15 s hasta que
+  `status == "ACTIVE_HEALTHY"` (suele tardar 2–4 min). No sigas hasta entonces.
 
-## 5. Escribir `.env.local`
-- Obtén la URL del proyecto (`get_project_url`) y la anon key
-  (`get_publishable_keys`) vía el MCP.
-- Escribe/actualiza `.env.local` con:
-  - `NEXT_PUBLIC_SUPABASE_URL=...`
-  - `NEXT_PUBLIC_SUPABASE_ANON_KEY=...`
+## 4. Aplicar la migración (Management API)
+- Lee `supabase/migrations/0001_init.sql` y ejecútalo:
+  ```
+  POST https://api.supabase.com/v1/projects/<ref>/database/query
+  { "query": "<contenido del .sql>" }
+  ```
+- Verifica que la tabla `public.messages` y sus políticas RLS existan
+  (otra `database/query` con un `select` al catálogo si hace falta). Cero SQL manual.
 
-## 6. Instalar y levantar
-- Corre `npm install` si `node_modules` no existe.
-- Levanta `npm run dev` y dile al alumno que abra http://localhost:3000.
-- Sugiere: crear una cuenta en /login y entrar al /dashboard para probar la auth.
+## 5. Desactivar confirmación de email (dev)
+- ```
+  PATCH https://api.supabase.com/v1/projects/<ref>/config/auth
+  { "mailer_autoconfirm": true }
+  ```
+  Así el alumno se registra y entra al instante.
 
-Al terminar, muestra un resumen: proyecto Supabase, estado de la migración,
-`.env.local` escrito y URL local.
+## 6. Traer las llaves y escribir `.env.local`
+- Project URL: `https://<ref>.supabase.co`.
+- Anon key: `GET https://api.supabase.com/v1/projects/<ref>/api-keys` (toma la
+  `anon` / publishable).
+- Escribe `.env.local` (gitignored) con:
+  - `NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon>`
+
+## 7. Instalar y levantar
+- `npm install` si falta `node_modules`, luego `npm run dev` (http://localhost:3000).
+
+## 8. Verificación rápida (opcional pero recomendado)
+- Confirma que la home carga y que `/dashboard` redirige a `/login` sin sesión.
+- Sugiere: crear cuenta en `/login` y entrar a `/dashboard`.
+
+Al terminar, muestra un resumen: proyecto + ref, migración aplicada, `.env.local`
+escrito, URL local, y el recordatorio de revocar el token.

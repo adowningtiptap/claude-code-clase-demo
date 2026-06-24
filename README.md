@@ -2,7 +2,7 @@
 
 Kit de arranque autónomo: **Next.js 16 + Supabase (DB + Auth) + Vercel**.
 Con Claude Code instalado, pegas el link del repo y el agente arma toda la base
-del proyecto por ti. Sin SQL manual, sin copiar llaves a mano, sin tokens.
+del proyecto por ti. Sin SQL manual, sin copiar llaves a mano.
 
 ---
 
@@ -21,14 +21,20 @@ del proyecto por ti. Sin SQL manual, sin copiar llaves a mano, sin tokens.
 
    > Clona y configura este proyecto: https://github.com/adowningtiptap/claude-code-clase-demo
 
-3. Claude clona el repo, lee `CLAUDE.md` y arranca el `/setup` solo. Solo te pide
-   **un OAuth de Supabase** (se abre el navegador, un clic — sin tokens).
+3. Claude clona el repo, lee `CLAUDE.md` y arranca el `/setup` solo. Te pedirá
+   **un Access Token de Supabase** (genéralo en
+   https://supabase.com/dashboard/account/tokens — empieza con `sbp_` — y pégalo).
 
-4. Listo: Claude crea la base de datos, corre la migración, configura la auth,
-   escribe `.env.local` y levanta la app en http://localhost:3000.
+4. Listo: Claude crea la base de datos vía la Management API, corre la migración,
+   configura la auth, escribe `.env.local` y levanta la app en
+   http://localhost:3000.
 
-5. Para publicar, dile a Claude **"despliega"** (comando `/deploy`): hará el
-   deploy en Vercel (otro OAuth de un clic) y te dará la URL en vivo.
+5. Para publicar, dile a Claude **"despliega"** (comando `/deploy`): te pedirá un
+   **token de Vercel** (https://vercel.com/account/tokens), creará el proyecto,
+   subirá las env vars y desplegará. Te da la URL en vivo.
+
+> Los tokens solo se usan para el setup y van en `.env.local` (gitignored, nunca
+> se suben). **Revócalos al terminar** la clase.
 
 > Requisitos para correr local: **Node 20+** y **Git**. Si no quieres instalar
 > nada, usa Codespaces (siguiente sección).
@@ -37,9 +43,10 @@ del proyecto por ti. Sin SQL manual, sin copiar llaves a mano, sin tokens.
 
 ## 🪟 En Windows
 
-Funciona en Windows nativo: los MCP de Supabase y Vercel son **HTTP** (no usan
-`npx`), así que no hay líos de `cmd`/`npx`. Solo necesitas **Claude Code, Node 20+
-y Git** instalados, y luego sigues los mismos pasos de arriba.
+Funciona en Windows nativo: `/setup` y `/deploy` aprovisionan vía **API con
+`curl`** (no por `npx`), así que no hay líos de `cmd`/`npx`. Solo necesitas
+**Claude Code, Node 20+ y Git** instalados, y luego sigues los mismos pasos de
+arriba.
 
 **Lo más fácil en Windows: GitHub Codespaces** (siguiente sección) — cero
 instalación, todo en el navegador.
@@ -74,7 +81,7 @@ lib/supabase/         # clientes Supabase (server, browser, middleware)
 proxy.ts              # refresca sesión y protege rutas (Next 16)
 supabase/migrations/  # esquema SQL (lo aplica /setup automáticamente)
 .claude/commands/     # comandos /setup y /deploy
-.mcp.json             # MCP HTTP de Supabase y Vercel (OAuth, sin tokens)
+.mcp.json             # MCP HTTP opcional (explorar la DB); el setup usa la API
 .devcontainer/        # entorno Codespaces (cero instalación)
 CLAUDE.md             # contexto + onboarding automático
 ```

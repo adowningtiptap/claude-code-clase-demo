@@ -13,12 +13,17 @@ escribir `.env.local`. No le pidas al alumno correr SQL ni copiar llaves a mano.
 
 Para desplegar, usa el flujo de `/deploy` (`.claude/commands/deploy.md`).
 
-## MCP
+## Aprovisionamiento (API, no MCP)
 
-- Supabase y Vercel están configurados como MCP **HTTP** en `.mcp.json`
-  (`https://mcp.supabase.com/mcp` y `https://mcp.vercel.com`). Ambos se
-  autentican con **OAuth de navegador** — sin tokens. Funcionan igual en
-  Windows, macOS, Linux y Codespaces.
+- `/setup` y `/deploy` usan la **Management API de Supabase** y la **API/CLI de
+  Vercel** con tokens (`curl`). Es el camino determinista que cubre todo el flujo
+  y funciona igual en Windows, macOS, Linux y Codespaces (sin `npx`).
+- **Higiene de secretos:** tokens y passwords van al **scratchpad**, nunca al
+  repo y nunca a pantalla. Lo único que se escribe en el proyecto es `.env.local`
+  (gitignored). Recuérdale al alumno revocar los tokens al terminar.
+- `.mcp.json` deja los MCP HTTP de Supabase/Vercel (OAuth) disponibles como
+  **conveniencia opcional** para explorar la DB en clase ("muéstrame mis tablas"),
+  pero el provisioning lo hace la API.
 
 ## Convenciones
 
