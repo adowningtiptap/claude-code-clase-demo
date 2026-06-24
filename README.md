@@ -41,6 +41,27 @@ del proyecto por ti. Sin SQL manual, sin copiar llaves a mano.
 
 ---
 
+## 🔑 Tus 2 tokens (sácalos antes de empezar)
+
+Necesitas un token de Supabase y uno de Vercel. Tenlos a mano y pégalos cuando
+Claude te los pida. Tardan ~1 minuto cada uno.
+
+**1. Token de Supabase** → https://supabase.com/dashboard/account/tokens
+- Inicia sesión (o crea cuenta gratis).
+- Botón **"Generate new token"** → ponle un nombre (ej. `clase-claude`) → **Generate**.
+- **Cópialo YA** (empieza con `sbp_`): Supabase **no lo vuelve a mostrar**.
+
+**2. Token de Vercel** (solo para el `/deploy`) → https://vercel.com/account/tokens
+- Inicia sesión (o crea cuenta gratis).
+- **"Create Token"** → nombre (ej. `clase-claude`) → Scope tu cuenta → expiración
+  (ej. 1 día) → **Create**.
+- **Cópialo** apenas aparezca.
+
+> 🔒 Los pegas una vez, viven en `.env.local` (que nunca se sube) y los **revocas
+> al terminar** la clase desde los mismos links.
+
+---
+
 ## 🪟 En Windows
 
 Funciona en Windows nativo: `/setup` y `/deploy` aprovisionan vía **API con
